@@ -1,6 +1,6 @@
 [project]
 name = "anime-sama-downloader-gui"
-version = "0.1.0"
+version = "0.1.1"
 description = "A GUI made to program anime downloading"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [tool.bumpversion]
-current_version = "0.1.0"
+current_version = "0.1.1"
 commit = false
 tag = false
 
