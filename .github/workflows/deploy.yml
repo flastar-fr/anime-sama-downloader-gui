@@ -21,7 +21,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-python-version: '3.12'
+        python-python-version: '3.14'
 
     - name: Install uv
       uses: astral-sh/setup-uv@v5
@@ -35,6 +35,11 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         
+        OLD_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+        echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
+        
+        git tag -a "v${{ env.OLD_VERSION }}" -m "Release v${{ env.OLD_VERSION }}"
+        
         uvx bump-my-version bump patch --allow-dirty
         
         NEW_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
@@ -43,7 +48,11 @@ jobs:
         git add pyproject.toml
         git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
         
-        git push origin main
+        if [ "$ACT" != "true" ]; then
+          git push origin main
+        else
+          echo "Test local via act détecté : le push Git est ignoré."
+        fi
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -61,6 +70,6 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/anime-sama-downloader-gui:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/anime-sama-downloader-gui:${{ env.NEW_VERSION }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/anime-sama-downloader-gui:${{ env.OLD_VERSION }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
