@@ -26,13 +26,13 @@ Le cas échéant, ajoutez des captures d'écran pour aider à expliquer votre pr
 **Ordinateur (merci de compléter les informations suivantes) :**
  - OS (Système d'exploitation) : [ex: Windows, macOS]
  - Navigateur : [ex: Chrome, Safari]
- - Version : [ex: 124]
+ - Version : [ex: 0.1.0]
 
 **Smartphone (merci de compléter les informations suivantes) :**
  - Appareil : [ex: iPhone 15, Samsung S24]
  - OS (Système d'exploitation) : [ex: iOS 17, Android 14]
  - Navigateur : [ex: Safari, Chrome Mobile]
- - Version : [ex: 124]
+ - Version : [ex: 0.1.0]
 
 **Contexte de l'erreur**
 Ajoutez ici tout autre contexte ou information concernant le problème.
