@@ -1,0 +1,66 @@
+name: CI/CD - Bump Version & Push to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-python-version: '3.12'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Bump version
+      env:
+        UV_LINK_MODE: copy
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        uvx bump-my-version bump patch --allow-dirty
+        
+        NEW_VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        
+        git add pyproject.toml
+        git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+        
+        git push origin main
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/anime-sama-downloader-gui:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/anime-sama-downloader-gui:${{ env.NEW_VERSION }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

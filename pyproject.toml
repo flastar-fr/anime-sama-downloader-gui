@@ -19,3 +19,13 @@ dependencies = [
     "python-multipart~=0.0.32",
     "APScheduler~=3.11.2"
 ]
+
+[tool.bumpversion]
+current_version = "0.1.0"
+commit = false
+tag = true
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
