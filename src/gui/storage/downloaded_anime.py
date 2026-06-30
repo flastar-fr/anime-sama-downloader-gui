@@ -11,7 +11,6 @@ class DownloadedAnime(BaseModel):
     lang: str
     season: str
     episode: int
-    season: str
 
 
 class DownloadedAnimes(BaseModel):
@@ -25,6 +24,10 @@ class DownloadedAnimes(BaseModel):
             downloaded_episode.episode
         )
         self.downloaded_episodes[episode_key] = downloaded_episode
+
+    def has_been_downloaded(self, title: str, season: str, lang: str, episode: int) -> bool:
+        episode_key = self.construct_anime_key(title, season, lang, episode)
+        return episode_key in self.downloaded_episodes
     
     @staticmethod
     def construct_anime_key(title: str, season: str, lang: str, episode: int) -> str:
@@ -47,6 +50,6 @@ def _load_downloaded_animes(path: str) -> DownloadedAnimes:
 
 
 animes_path = "config/downloaded_anime.json"
-app_datas: DownloadedAnimes = _load_downloaded_animes(animes_path)
+downloaded_animes: DownloadedAnimes = _load_downloaded_animes(animes_path)
 
-atexit.register(app_datas.save)
+atexit.register(downloaded_animes.save)

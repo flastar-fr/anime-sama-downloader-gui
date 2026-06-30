@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from gui.storage.downloaded_anime import downloaded_animes, DownloadedAnime
 from src.gui.utils.cached import get_cached_planning
 from gui.storage.config import settings
 from src.gui.utils.error import DownloadError, FetchError
@@ -46,6 +47,17 @@ async def run_single_check():
                 app_datas.save()
                 app_logger.info(
                     f"Téléchargement automatique terminé pour {anime.title} (E{anime.week_episode - 1}).")
+                downloaded_animes.add_new_episode(
+                    DownloadedAnime(
+                        anime_url=anime.anime_url,
+                        image=anime.image,
+                        title=anime.title,
+                        lang=anime.lang,
+                        season=anime.season,
+                        episode=anime.week_episode - 1,
+                        
+                    )
+                )
 
             except FetchError:
                 app_logger.warning(
