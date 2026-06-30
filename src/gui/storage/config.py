@@ -3,6 +3,18 @@ import os
 
 from pydantic import BaseModel
 
+SOURCE_CONFIG = [
+    "vidmoly.net",
+    "vidmoly.to",
+    "video.sibnet.ru",
+    "sendvid.com",
+    "embed4me.com",
+    "movearnpre.com",
+    "smoothpre.com",
+    "mivalyo.com",
+    "dingtezuni.com",
+]
+
 
 class CloudflareConfig(BaseModel):
     cf_clearance: str
@@ -13,6 +25,7 @@ class Config(BaseModel):
     cloudflare_config: CloudflareConfig
     domain: str
     refresh_interval: int
+    players: list[str]
 
     def save(self):
         os.makedirs("config", exist_ok=True)
@@ -30,7 +43,8 @@ def _load_config(path: str) -> Config:
                 user_agent="Mozilla/5.0"
             ),
             domain="anime-sama.to",
-            refresh_interval=15
+            refresh_interval=15,
+            players=SOURCE_CONFIG
         )
 
 
