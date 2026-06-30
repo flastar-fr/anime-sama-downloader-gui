@@ -4,7 +4,7 @@ from starlette.responses import HTMLResponse
 
 from src.gui.utils.cached import get_cached_planning
 from src.gui.utils.cloudflare import get_headers
-from src.gui.utils.config import settings
+from gui.storage.config import settings
 from src.gui.utils.utils import normalize_catalog_url
 from src.utils.fetch.detail import fetch_anime_details
 from src.utils.search.expand_catalogue import expand_catalogue_url
