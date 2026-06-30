@@ -1,4 +1,5 @@
 import atexit
+import os
 
 from pydantic import BaseModel
 
@@ -14,6 +15,7 @@ class Config(BaseModel):
     refresh_interval: int
 
     def save(self):
+        os.makedirs("config", exist_ok=True)
         with open(config_path, "w", encoding="utf-8") as f:
             f.write(self.model_dump_json(indent=2))
 
@@ -32,7 +34,7 @@ def _load_config(path: str) -> Config:
         )
 
 
-config_path = "config.json"
+config_path = "config/config.json"
 settings: Config = _load_config(config_path)
 
 atexit.register(settings.save)

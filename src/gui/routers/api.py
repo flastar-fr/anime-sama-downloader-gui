@@ -10,7 +10,7 @@ from starlette.responses import HTMLResponse, StreamingResponse
 
 from src.gui.utils.cloudflare import get_headers
 from src.gui.daemon import run_single_check, verify_planning_integrity
-from src.gui.utils.config import settings
+from gui.storage.config import settings
 from src.gui.utils.error import DownloadError
 from src.gui.utils.logger import log_clients, log_history, app_logger
 from src.gui.routers.web import templates, get_cached_planning

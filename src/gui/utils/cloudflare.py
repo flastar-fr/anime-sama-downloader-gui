@@ -1,4 +1,4 @@
-from src.gui.utils.config import CloudflareConfig, settings
+from gui.storage.config import CloudflareConfig, settings
 from src.var import generate_requests_headers
 
 
