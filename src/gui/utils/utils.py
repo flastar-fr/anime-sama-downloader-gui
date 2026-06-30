@@ -8,18 +8,6 @@ DAY_INDEX = {
     "Jeudi": 3, "Vendredi": 4, "Samedi": 5, "Dimanche": 6
 }
 
-SOURCE_CONFIG = [
-    "vidmoly.net",
-    "vidmoly.to",
-    "video.sibnet.ru",
-    "sendvid.com",
-    "embed4me.com",
-    "movearnpre.com",
-    "smoothpre.com",
-    "mivalyo.com",
-    "dingtezuni.com",
-]
-
 
 def get_domain() -> str:
     return settings.domain
@@ -67,18 +55,18 @@ def normalize_catalog_url(url: str) -> str:
 
 
 def is_from_unknown_source(url: str) -> bool:
-    for source in SOURCE_CONFIG:
+    for source in settings.players:
         if source.lower() in url:
             return False
     return True
 
 
 def order_episodes_sources(sources: list[str]) -> list[str]:
-    config_ranks = {config: index for index, config in enumerate(SOURCE_CONFIG)}
+    config_ranks = {config: index for index, config in enumerate(settings.players)}
 
     linked_sources = {}
     for source in sources:
-        for config_source in SOURCE_CONFIG:
+        for config_source in settings.players:
             if config_source in source and not is_from_unknown_source(source):
                 linked_sources[source] = config_source
                 break

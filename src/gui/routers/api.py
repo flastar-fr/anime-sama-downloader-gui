@@ -2,7 +2,7 @@ import asyncio
 import html
 import json
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, List
 
 from fastapi import APIRouter, Query, Form, BackgroundTasks
 from starlette.requests import Request
@@ -432,12 +432,14 @@ async def save_settings(
         domain: str = Form(""),
         user_agent: str = Form(""),
         cf_clearance: str = Form(""),
-        refresh_interval: int = Form(15)
+        refresh_interval: int = Form(15),
+        players: List[str] = Form(...)
 ):
     settings.domain = domain
     settings.cloudflare_config.user_agent = user_agent
     settings.cloudflare_config.cf_clearance = cf_clearance
     settings.refresh_interval = refresh_interval
+    settings.players = players
 
     settings.save()
 

@@ -150,7 +150,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ajout d'une petite ombre pour le mettre en valeur */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .btn-save:hover {
@@ -161,4 +161,9 @@
 .btn-save.htmx-request {
     opacity: 0.7;
     pointer-events: none;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: var(--bg-main) !important;
 }
