@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.gui.utils.cached import get_cached_planning
-from src.gui.utils.config import settings
+from gui.storage.config import settings
 from src.gui.utils.error import DownloadError, FetchError
 from src.gui.utils.logger import app_logger
 from src.gui.storage.anime_data import app_datas, AnimeData

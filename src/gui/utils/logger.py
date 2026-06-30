@@ -1,5 +1,7 @@
 import logging
 import asyncio
+import os
+
 from datetime import datetime
 from collections import deque
 
@@ -38,7 +40,9 @@ def _setup_logger():
     logger = logging.getLogger("AS_Downloader")
     logger.setLevel(logging.DEBUG)
 
-    file_handler = logging.FileHandler("downloads.log", encoding="utf-8")
+    os.makedirs("config", exist_ok=True)
+
+    file_handler = logging.FileHandler("config/downloads.log", encoding="utf-8")
     file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 
     web_handler = HTMXConsoleHandler()

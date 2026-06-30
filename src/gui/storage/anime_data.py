@@ -1,4 +1,6 @@
 import atexit
+import os
+
 from datetime import datetime, timedelta
 
 from pydantic import BaseModel
@@ -53,6 +55,7 @@ class AnimeData(BaseModel):
         return list(self.registered_animes[day].values())
 
     def save(self):
+        os.makedirs("config", exist_ok=True)
         with open(animes_path, "w", encoding="utf-8") as f:
             f.write(self.model_dump_json(indent=2))
 
@@ -156,7 +159,7 @@ def _load_animes(path: str) -> AnimeData:
         )
 
 
-animes_path = "anime_data.json"
+animes_path = "config/anime_data.json"
 app_datas: AnimeData = _load_animes(animes_path)
 
 atexit.register(app_datas.save)
