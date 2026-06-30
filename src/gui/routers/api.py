@@ -276,7 +276,7 @@ async def get_planning_content(request: Request, lang: str = Query("all")):
         "VA": "en"
     }
 
-    filtered_planning = {day: [] for day in full_planning}
+    filtered_planning = {}
 
     if lang == "all":
         filtered_planning = full_planning
