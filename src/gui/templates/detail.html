@@ -209,6 +209,15 @@
                     header.classList.toggle('active');
                 });
             });
+
+            const synopsis = document.getElementById('synopsisText');
+            const btn = document.getElementById('vpSynopsis');
+
+            if (synopsis && btn) {
+                if (synopsis.scrollHeight <= synopsis.clientHeight) {
+                    btn.style.display = 'none';
+                }
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -223,7 +232,7 @@
             const synopsis = document.getElementById('synopsisText');
             const btn = document.getElementById('vpSynopsis');
 
-            if (!synopsis) return;
+            if (!synopsis || !btn) return;
 
             if (synopsis.classList.contains('expanded')) {
                 synopsis.classList.remove('expanded');
