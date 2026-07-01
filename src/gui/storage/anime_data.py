@@ -82,7 +82,7 @@ class AnimeData(BaseModel):
             self.unregister_anime(title, season, lang)
             self.save()
 
-    def switch_anime_day(self, title: str, season: str, lang: str, old_day: int, new_day: int):
+    def switch_anime_date(self, title: str, season: str, lang: str, old_day: int, new_day: int, release_hours: int, release_min: int):
         unique_key = self.construct_anime_key(title, season, lang)
         if unique_key not in self.registered_animes_keys:
             raise ValueError(f"Anime {unique_key} is not registered")
@@ -90,6 +90,8 @@ class AnimeData(BaseModel):
         anime = self.registered_animes[old_day].pop(unique_key, None)
         if anime:
             anime.release_day = new_day
+            anime.release_hour = release_hours
+            anime.release_min = release_min
             self.registered_animes[new_day][unique_key] = anime
 
     def get_pending_scheduled_animes(self, current_time: datetime) -> list[RegisteredAnime]:

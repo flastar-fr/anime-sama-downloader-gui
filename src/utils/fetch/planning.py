@@ -21,6 +21,9 @@ class Anime:
     url: str
     has_been_programmed: bool = False
 
+    def is_same_date(self, day: int, hour: int, minute: int) -> bool:
+        return self.release_day == day and self.release_hour == hour and self.release_minute == minute
+
 
 def _parse_anime_card(card: Tag, day: str) -> Optional[Anime]:
     card_classes = card.get('class')

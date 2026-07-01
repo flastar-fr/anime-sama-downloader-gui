@@ -124,9 +124,16 @@ async def _verify_release_day(planning_animes: dict[str, Anime]):
     for anime in app_datas.anime_of_week:
         anime_key = AnimeData.construct_anime_key(anime.title, anime.season, anime.lang)
         planning_anime = planning_animes[anime_key]
-        if planning_anime.release_day != anime.release_day:
-            app_datas.switch_anime_day(anime.title, anime.season, anime.lang, anime.release_day,
-                                       planning_anime.release_day)
+        if not planning_anime.is_same_date(anime.release_day, anime.release_hour, anime.release_min):
+            app_datas.switch_anime_date(
+                anime.title,
+                anime.season,
+                anime.lang,
+                anime.release_day,
+                planning_anime.release_day,
+                planning_anime.release_hour,
+                planning_anime.release_minute
+            )
 
 
 async def _verify_finished_anime(planning_animes: dict[str, Anime]):
