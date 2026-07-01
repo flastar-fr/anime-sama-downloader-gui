@@ -14,24 +14,32 @@ class DownloadedAnime(BaseModel):
 
 
 class DownloadedAnimes(BaseModel):
-    downloaded_episodes: dict[str, DownloadedAnime]
+    downloaded_episodes: dict[str, list[DownloadedAnime]]
 
     def add_new_episode(self, downloaded_episode: DownloadedAnime):
         episode_key = self.construct_anime_key(
             downloaded_episode.title,
             downloaded_episode.season,
             downloaded_episode.lang,
-            downloaded_episode.episode
         )
-        self.downloaded_episodes[episode_key] = downloaded_episode
 
-    def has_been_downloaded(self, title: str, season: str, lang: str, episode: int) -> bool:
-        episode_key = self.construct_anime_key(title, season, lang, episode)
+        existing_episodes = self.downloaded_episodes.get(episode_key, [])
+        self.downloaded_episodes[episode_key] = existing_episodes + [downloaded_episode]
+
+    def has_been_downloaded(self, title: str, season: str, lang: str) -> bool:
+        episode_key = self.construct_anime_key(title, season, lang)
         return episode_key in self.downloaded_episodes
+
+    @property
+    def episodes(self):
+        episodes = []
+        for episodes_list in self.downloaded_episodes.values():
+            episodes.extend(episodes_list)
+        return episodes
     
     @staticmethod
-    def construct_anime_key(title: str, season: str, lang: str, episode: int) -> str:
-        return f"{title}-{season}-{lang}-{episode}"
+    def construct_anime_key(title: str, season: str, lang: str) -> str:
+        return f"{title}-{season}-{lang}"
 
     def save(self):
         os.makedirs("config", exist_ok=True)

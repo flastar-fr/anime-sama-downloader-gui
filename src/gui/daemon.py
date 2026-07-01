@@ -58,6 +58,7 @@ async def run_single_check():
                         
                     )
                 )
+                downloaded_animes.save()
 
             except FetchError:
                 app_logger.warning(

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query, Form, BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, StreamingResponse
 
+from gui.storage.downloaded_anime import downloaded_animes
 from src.gui.utils.cloudflare import get_headers
 from src.gui.daemon import run_single_check, verify_planning_integrity
 from gui.storage.config import settings
@@ -20,6 +21,11 @@ from src.utils.download.download_gui import download_episodes_from_url
 from src.utils.fetch.fetch_episodes import fetch_episodes
 from src.utils.fetch.planning import Anime
 from src.utils.search.search_bar import search_anime_query
+
+
+ICON_DONE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>'
+ICON_PENDING = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+
 
 router = APIRouter(tags=["Backend / Download API"])
 
@@ -156,8 +162,7 @@ async def unschedule_anime(
 
 @router.get("/today-anime", response_class=HTMLResponse)
 async def get_today_anime():
-    now = datetime.now()
-    animes_day = app_datas.animes_from_day(now.weekday())
+    animes_day = app_datas.animes_from_day(datetime.now().weekday())
 
     if not animes_day:
         return """
@@ -166,51 +171,49 @@ async def get_today_anime():
         </div>
         """
 
-    animes_day = sorted(animes_day, key=lambda a: (int(a.release_hour), int(a.release_min)))
+    animes_day.sort(key=lambda a: (int(a.release_hour), int(a.release_min)))
 
-    anime_cards = ""
-    for anime in animes_day:
-        release_date = create_datetime_from_day(anime.release_day, anime.release_hour, anime.release_min)
-
-        if release_date <= now:
-            status_html = """
-                <div class="card-status done">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                    Téléchargé
-                </div>
-            """
+    def build_card(card_anime, is_downloaded: bool):
+        if is_downloaded:
+            episode = card_anime.episode
+            status_html = f'<div class="card-status done">{ICON_DONE} Téléchargé</div>'
         else:
-            minute_str = str(anime.release_min).zfill(2)
-            status_html = f"""
-                <div class="card-status pending">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Prévu à {anime.release_hour}h{minute_str}
-                </div>
-            """
+            episode = card_anime.week_episode
+            minute_str = str(card_anime.release_min).zfill(2)
+            status_html = f'<div class="card-status pending">{ICON_PENDING} Prévu à {card_anime.release_hour}h{minute_str}</div>'
 
-        anime_cards += f"""
+        return f"""
             <div class="anime-card">
-                <a href="/detail?url={anime.anime_url}" style="text-decoration: none; color: inherit; display: block;">
+                <a href="/detail?url={card_anime.anime_url}" style="text-decoration: none; color: inherit; display: block;">
                     <div class="card-image-wrapper">
-                        <img src="{anime.image}" alt="{anime.title}">
+                        <img src="{card_anime.image}" alt="{card_anime.title}">
                         <span class="badge badge-type">Anime</span>
-                        <span class="badge badge-lang">{anime.lang}</span>
+                        <span class="badge badge-lang">{card_anime.lang}</span>
                     </div>
                 </a>
                 <div class="card-content">
-                    <a href="/detail?url={anime.anime_url}" style="text-decoration: none; color: inherit;">
-                        <h3 class="card-title" title="{anime.title}">{anime.title}</h3>
+                    <a href="/detail?url={card_anime.anime_url}" style="text-decoration: none; color: inherit;">
+                        <h3 class="card-title" title="{card_anime.title}">{card_anime.title}</h3>
                     </a>
                     <div class="card-info">
-                        <span>Épisode {anime.week_episode}</span>
-                        <span>{anime.season}</span>
+                        <span>Épisode {episode}</span>
+                        <span>{card_anime.season}</span>
                     </div>
                     {status_html}
                 </div>
             </div>
         """
 
-    return anime_cards
+    anime_cards = []
+
+    for downloaded in downloaded_animes.episodes:
+        anime_cards.append(build_card(downloaded, is_downloaded=True))
+
+    for anime in animes_day:
+        if not downloaded_animes.has_been_downloaded(anime.title, anime.season, anime.lang):
+            anime_cards.append(build_card(anime, is_downloaded=False))
+
+    return "".join(anime_cards)
 
 
 @router.get("/recent-anime", response_class=HTMLResponse)
@@ -467,4 +470,3 @@ async def get_original_save_button():
         Sauvegarder les paramètres
     </button>
     """
-
