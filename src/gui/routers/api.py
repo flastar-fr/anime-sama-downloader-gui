@@ -99,6 +99,8 @@ async def schedule_anime(
     available_episodes = fetch_episodes(get_anime_catalog_url(anime_url), headers=get_headers())
     last_episode_released: int = get_last_episode_released(available_episodes) if available_episodes else 0
 
+    # TODO : implement verification via main Anime Sama page that checks if the episode has already been released or not
+    # Comparison via day (like now) and if same day comparison via main Anime Sama page
     week_episode = last_episode_released + 1 if anime_date > anime_date.now() else last_episode_released
 
     app_datas.add_new_anime(anime_url, image, anime, lang, season, week_episode, anime_date)
