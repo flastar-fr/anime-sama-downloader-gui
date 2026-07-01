@@ -146,7 +146,7 @@ scheduler = AsyncIOScheduler()
 
 scheduler.add_job(
     verify_planning_integrity,
-    CronTrigger(day_of_week='mon', hour=20, minute=0)
+    CronTrigger(hour=20, minute=0)
 )
 
 scheduler.add_job(verify_planning_integrity)
