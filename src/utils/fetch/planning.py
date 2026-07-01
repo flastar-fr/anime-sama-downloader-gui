@@ -25,7 +25,7 @@ class Anime:
 def _parse_anime_card(card: Tag, day: str) -> Optional[Anime]:
     card_classes = card.get('class')
 
-    if not card_classes or "Anime" not in card_classes:
+    if not card_classes or "Anime" not in card_classes and "Scans" not in card_classes:
         return None
 
     link_elem = card.find('a')
@@ -46,19 +46,23 @@ def _parse_anime_card(card: Tag, day: str) -> Optional[Anime]:
             language = str(alt_text[0] if isinstance(alt_text, list) else alt_text)
 
     info_texts = card.find_all('span', class_='info-text')
-    release_hour = "Unknown"
+    release_hour_str = "Unknown"
     season = "N/A"
 
-    if len(info_texts) > 0:
-        release_hour = info_texts[0].text.strip()
-    if len(info_texts) > 1:
-        season = info_texts[1].text.strip()
+    for span in info_texts:
+        classes = span.get('class', [])
+        text = span.text.strip()
 
-    hour_minute: list[str] = release_hour.split('h')
+        if 'font-bold' in classes:
+            release_hour_str = text
+        elif 'saison' in text.lower():
+            season = text
+
+    hour_minute: list[str] = release_hour_str.split('h')
     try:
         release_hour = int(hour_minute[0])
-        release_minute = int(hour_minute[1]) if len(hour_minute) > 1 else 0
-    except ValueError:
+        release_minute = int(hour_minute[1]) if len(hour_minute) > 1 and hour_minute[1].isdigit() else 0
+    except (ValueError, IndexError):
         release_hour = 12
         release_minute = 0
 
